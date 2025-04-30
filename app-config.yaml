@@ -89,8 +89,29 @@ auth:
     # See https://backstage.io/docs/auth/guest/provider
     guest: {}
 
+    github:
+      development:
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+        ## uncomment if using GitHub Enterprise
+        # enterpriseInstanceUrl: ${AUTH_GITHUB_ENTERPRISE_INSTANCE_URL}
+        ## uncomment to set lifespan of user session
+        # sessionDuration: { hours: 24 } # supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
+        signIn:
+          resolvers:
+            # See https://backstage.io/docs/auth/github/provider#resolvers for more resolvers
+            - resolver: usernameMatchingUserEntityName
+
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
+  # set to false to disable GitHub URL annotation on the task execution page
+  # github.com configuration
+  defaultAuthor:
+    name: Upendra Sahu
+    email: upendra.sahu@xoriant.com
+  defaultCommitMessage: Initial commit from Backstage
+  # don't use defaultOwner if you want to allow other org/user on the form
+  #defaultOwner: upendrasahu
 
 catalog:
   import:
@@ -114,7 +135,7 @@ catalog:
       target: ../../examples/org.yaml
       rules:
         - allow: [User, Group]
-    
+
     # Main catalog file from exercise_tracker repo
     - type: url
       target: https://raw.githubusercontent.com/upendrasahu/exercise_tracker/main/catalog-info.yaml
