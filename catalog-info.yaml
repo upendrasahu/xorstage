@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: xorstage
+  description: An example of a Backstage application.
+  annotations:
+    github.com/project-slug: upendrasahu/xorstage
+    backstage.io/techdocs-ref: dir:.
+    backstage.io/view-url: https://github.com/upendrasahu/xorstage
+    backstage.io/edit-url: https://github.com/upendrasahu/xorstage/edit/main
+    backstage.io/source-location: url:https://github.com/upendrasahu/xorstage
+spec:
+  type: website
+  owner: john@example.com
+  lifecycle: experimental
