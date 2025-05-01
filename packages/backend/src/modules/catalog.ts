@@ -4,7 +4,6 @@ import {
   GithubOrgReaderProcessor 
 } from '@backstage/plugin-catalog-backend-module-github';
 import { ScaffolderEntitiesProcessor } from '@backstage/plugin-catalog-backend-module-scaffolder-entity-model';
-import { catalogPlugin } from '@backstage/plugin-catalog-node';
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
 
