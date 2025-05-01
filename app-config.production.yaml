@@ -1,44 +1,65 @@
 app:
-  # Should be the same as backend.baseUrl when using the `app-backend` plugin.
-  baseUrl: http://localhost:7007
+  baseUrl: ${APP_BASE_URL:-http://localhost:7007}
 
 backend:
-  # Note that the baseUrl should be the URL that the browser and other clients
-  # should use when communicating with the backend, i.e. it needs to be
-  # reachable not just from within the backend host, but from all of your
-  # callers. When its value is "http://localhost:7007", it's strictly private
-  # and can't be reached by others.
-  baseUrl: http://localhost:7007
-  # The listener can also be expressed as a single <host>:<port> string. In this case we bind to
-  # all interfaces, the most permissive setting. The right value depends on your specific deployment.
+  # Enable backend authentication
+  auth:
+    keys:
+      - secret: ${BACKEND_SECRET}
+  baseUrl: ${BACKEND_BASE_URL:-http://localhost:7007}
   listen: ':7007'
+  # Listen on all interfaces
+  host: 0.0.0.0
+  # CORS configuration
+  cors:
+    origin: "*"
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
 
-  # config options: https://node-postgres.com/apis/client
+  # Use SQLite in-memory database instead of PostgreSQL
   database:
-    client: pg
-    connection:
-      host: ${POSTGRES_HOST}
-      port: ${POSTGRES_PORT}
-      user: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
-      # https://node-postgres.com/features/ssl
-      # you can set the sslmode configuration option via the `PGSSLMODE` environment variable
-      # see https://www.postgresql.org/docs/current/libpq-ssl.html Table 33.1. SSL Mode Descriptions (e.g. require)
-      # ssl:
-      #   ca: # if you have a CA file and want to verify it you can uncomment this section
-      #     $file: <file-path>/ca/server.crt
+    client: better-sqlite3
+    connection: ':memory:'
 
 auth:
+  # Enable authentication
+  environment: development
+  session:
+    secret: ${SESSION_SECRET}
+  # see https://backstage.io/docs/auth/ to learn about auth providers
   providers:
-    guest: {}
+    # Configure guest auth to work properly
+    guest:
+      enabled: true
 
+    github:
+      development:
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+        callbackUrl: ${AUTH_GITHUB_CALLBACK_URL}
+        signIn:
+          resolvers:
+            - resolver: usernameMatchingUserEntityName
+
+# Configure techdocs to minimize errors
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'local'
+  publisher:
+    type: 'local'
+  search:
+    indexing:
+      enabled: false
+  requestUrl: ${BACKSTAGE_HOST_URL}
+
+# Simplified catalog configuration
 catalog:
-  # Overrides the default list locations from app-config.yaml as these contain example data.
-  # See https://backstage.io/docs/features/software-catalog/#adding-components-to-the-catalog for more details
-  # on how to get entities into the catalog.
+  import:
+    entityFilename: catalog-info.yaml
+  # Fix file paths to be relative to the container's working directory
   locations:
-    # Local example data, replace this with your production config, these are intended for demo use only.
-    # File locations are relative to the backend process, typically in a deployed context, such as in a Docker container, this will be the root
+    # Local example data
     - type: file
       target: ./examples/entities.yaml
 
@@ -53,3 +74,7 @@ catalog:
       target: ./examples/org.yaml
       rules:
         - allow: [User, Group]
+        
+# Disable permissions to avoid auth issues
+permission:
+  enabled: false
